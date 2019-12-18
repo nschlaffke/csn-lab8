@@ -1,0 +1,15 @@
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Wed Dec 18 23:29:25 2019
+\begin{table}[ht]
+\centering
+\begin{tabular}{rr}
+  \hline
+ & Epidemic threshold \\
+  \hline
+full\_graph & 0.00 \\
+  er\_graph & 0.09 \\
+  ws\_graph & 0.12 \\
+  ba\_graph & 0.14 \\
+   \hline
+\end{tabular}
+\end{table}
