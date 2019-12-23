@@ -24,7 +24,7 @@ get_stat <- function(graph) {
   print(i)
 }
 
-experiment <- function(graph) {
+experiment <- function(graph, beta, gamma) {
 
   V(graph)$labels <- rep("s", n) # All are susceptible
   
@@ -78,7 +78,7 @@ all.results <- list()
 i <- 1
 for (graph in graphs) {
   print(graph$name)
-  result <- experiment(graph)
+  result <- experiment(graph, beta, gamma)
   all.results[[i]] <- result
   i <- i + 1
 }
@@ -98,3 +98,63 @@ plot <- ggplot(df, aes(time, value)) +
 show(plot)
 
 eigen_vals <- sapply(graphs, function(graph) spectrum(graph, which=list(pos="LA", howmany=1))$values)
+
+#
+# Task 2
+#
+
+format_data <- function(data, title, color, frac) {
+    
+    to_df <- as.data.frame(data)
+    to_df$time <- seq.int(nrow(to_df))
+    final_df <- melt(to_df,  id.vars = 'time', variable.name = "simulation")
+    
+    final.plot <- ggplot(final_df, aes(time, value)) + 
+        geom_line(aes(colour = simulation)) + 
+        ggtitle(title) +
+        scale_color_manual(labels = c(title), values = c(color)) +
+        ylab("Infected") + 
+        xlab("Time") +
+        theme(legend.position = "none") +
+        annotate("text", x=max(final_df$time)-15, 
+                 y=max(final_df$value)-15, label= paste("β/γ = ", frac), size=5)
+    
+    show(final.plot)
+}
+
+run_all <- function(graph_n, b, g, title, color) {
+    
+    beta <- b
+    gamma <- g
+    cat(graph_n$name, title,"β = ", beta, ", γ = ", gamma,"\n")
+    result.epidemic <- experiment(graph_n, beta, gamma)
+    format_data(result.epidemic, title, color, b/g)
+}
+
+
+for (graph in graphs) {
+    if (graph$name == "Full graph"){
+        run_all(graph, b=0.002, g=0.1,
+                "Full Graph - Epidemic occurs", "red")
+        run_all(graph, b=0.00005, g=0.1,
+                "Full Graph - No Epidemic occurs", "blue")
+    }
+    if (graph$name == "Erdos renyi (gnp) graph"){
+        run_all(graph, b=0.03, g=0.1,
+                "Erdos-Renyi - Epidemic occurs", "red")
+        run_all(graph, b=0.007, g=0.1,
+                "Erdos-Renyi - No Epidemic occurs", "blue")
+    }
+    if (graph$name == "Watts-Strogatz random graph"){
+        run_all(graph, b=0.07, g=0.1,
+                "Watts-Strogatz - Epidemic occurs", "red")
+        run_all(graph, b=0.005, g=0.1,
+                "Watts-Strogatz - No Epidemic occurs", "blue")
+    }
+    if (graph$name == "Barabasi graph"){
+        run_all(graph, b=0.5, g=0.1,
+                "Barabasi - Epidemic occurs", "red")
+        run_all(graph, b=0.005, g=0.1,
+                "Barabasi - No Epidemic occurs", "blue")
+    }
+}
