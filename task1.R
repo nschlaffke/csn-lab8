@@ -103,7 +103,8 @@ eigen_vals <- sapply(graphs, function(graph) spectrum(graph, which=list(pos="LA"
 # Task 2
 #
 
-format_data <- function(data, title, color, frac) {
+# function to format data in dataframe and print
+format_data <- function(data, title, color, fract) {
     
     to_df <- as.data.frame(data)
     to_df$time <- seq.int(nrow(to_df))
@@ -116,22 +117,24 @@ format_data <- function(data, title, color, frac) {
         ylab("Infected") + 
         xlab("Time") +
         theme(legend.position = "none") +
-        annotate("text", x=max(final_df$time)-15, 
-                 y=max(final_df$value)-15, label= paste("β/γ = ", frac), size=5)
+        annotate("text", x=max(final_df$time)-20, 
+                 y=mean(final_df$value)*3, label= paste0("frac(","β", 
+                                                         ",", "γ", ")==",fract), size=5, parse=TRUE)
     
     show(final.plot)
 }
 
+# function to run simulation and then format and print
 run_all <- function(graph_n, b, g, title, color) {
     
     beta <- b
     gamma <- g
     cat(graph_n$name, title,"β = ", beta, ", γ = ", gamma,"\n")
     result.epidemic <- experiment(graph_n, beta, gamma)
-    format_data(result.epidemic, title, color, b/g)
+    format_data(result.epidemic, title, color, beta/gamma)
 }
 
-
+# run for all graphs with their corresponding β and γ
 for (graph in graphs) {
     if (graph$name == "Full graph"){
         run_all(graph, b=0.002, g=0.1,
@@ -140,19 +143,19 @@ for (graph in graphs) {
                 "Full Graph - No Epidemic occurs", "blue")
     }
     if (graph$name == "Erdos renyi (gnp) graph"){
-        run_all(graph, b=0.03, g=0.1,
+        run_all(graph, b=0.04, g=0.1,
                 "Erdos-Renyi - Epidemic occurs", "red")
         run_all(graph, b=0.007, g=0.1,
                 "Erdos-Renyi - No Epidemic occurs", "blue")
     }
     if (graph$name == "Watts-Strogatz random graph"){
-        run_all(graph, b=0.07, g=0.1,
+        run_all(graph, b=0.08, g=0.1,
                 "Watts-Strogatz - Epidemic occurs", "red")
         run_all(graph, b=0.005, g=0.1,
                 "Watts-Strogatz - No Epidemic occurs", "blue")
     }
     if (graph$name == "Barabasi graph"){
-        run_all(graph, b=0.5, g=0.1,
+        run_all(graph, b=0.3, g=0.1,
                 "Barabasi - Epidemic occurs", "red")
         run_all(graph, b=0.005, g=0.1,
                 "Barabasi - No Epidemic occurs", "blue")
